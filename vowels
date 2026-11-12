@@ -1,0 +1,30 @@
+Vowels and consonants
+%{
+#include <stdio.h>
+int v = 0;
+int c = 0;
+%}
+
+%%
+[aeiouAEIOU] { v++; }                     /* If vowel, increment v */
+[a-zA-Z]     { c++; }                     /* If other letter, increment c */
+\n           { 
+               printf("Number of vowels are: %d\n", v);
+               printf("Number of consonants are: %d\n\n", c);
+               v = 0; // Reset for next line
+               c = 0; 
+             }
+.            { /* Ignore non-alphabetic characters like numbers or spaces */ }
+%%
+
+int yywrap() 
+{
+    return 1;
+}
+
+int main() 
+{
+    printf("Enter the string of vowels and consonants:\n");
+    yylex();
+    return 0;
+}
