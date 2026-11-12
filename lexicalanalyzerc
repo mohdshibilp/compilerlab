@@ -1,0 +1,93 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+int main() 
+{
+    FILE *f1;
+    char c, str[20];
+    int lineno = 1, num = 0, i = 0;
+    
+    printf("\nEnter the C program (Press Ctrl+D or Ctrl+Z to end):\n");
+    f1 = fopen("input.txt", "w");
+    if (f1 == NULL) {
+        printf("Error opening file!\n");
+        return 1;
+    }
+    
+    // Read input from user and write to file
+    while((c = getchar()) != EOF) {
+        putc(c, f1);
+    }
+    fclose(f1);
+    
+    // Read from file and analyze tokens
+    f1 = fopen("input.txt", "r");
+    if (f1 == NULL) {
+        printf("Error reading file!\n");
+        return 1;
+    }
+    
+    while((c = getc(f1)) != EOF) 
+    {
+        // Check for numbers
+        if(isdigit(c)) 
+        {
+            num = c - '0';
+            
+            c = getc(f1);
+            while(isdigit(c)) 
+            {
+                num = num * 10 + (c - '0');
+                c = getc(f1);
+            }
+            ungetc(c, f1); // Put back the non-digit character
+            printf("%d is a number \n", num);
+        }
+        // Check for identifiers and keywords
+        else if (isalpha(c)) 
+        {
+            str[i++] = c;
+            c = getc(f1);
+            while(isdigit(c) || isalpha(c) || c == '_' || c == '$') 
+            {
+                str[i++] = c;
+                c = getc(f1);
+            }
+            str[i++] = '\0';
+            
+            // Keyword matching
+            if(strcmp("for", str)==0 || strcmp("while", str)==0 || 
+               strcmp("int", str)==0 || strcmp("float", str)==0 || 
+               strcmp("do", str)==0 || strcmp("char", str)==0 || 
+               strcmp("double", str)==0 || strcmp("static", str)==0 || 
+               strcmp("switch", str)==0 || strcmp("case", str)==0) 
+            {
+                printf("%s is a keyword\n", str);
+            } 
+            else 
+            {
+                printf("%s is an identifier\n", str);
+            }
+            
+            ungetc(c, f1);
+            i = 0; // Reset string index
+        }
+        // Handle whitespaces and newlines
+        else if(c == ' ' || c == '\t') {
+            continue;
+        }
+        else if(c == '\n') {
+            lineno++;
+        }
+        // Handle special symbols
+        else {
+            printf("%c is a special symbol\n", c);
+        }
+    }
+    
+    printf("Total no. of lines are: %d\n", lineno);
+    fclose(f1);
+    return 0;
+}
