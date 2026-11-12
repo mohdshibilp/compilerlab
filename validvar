@@ -1,0 +1,58 @@
+validvar usinglex
+
+valvar.l
+
+%{
+#include "y.tab.h"
+%}
+
+%%
+[a-zA-Z]  { return ALPHA; }
+[0-9]     { return DIGIT; }
+\n        { return 0; }
+.         { return yytext[0]; }
+%%
+
+int yywrap() 
+{
+    return 1;
+}
+
+valvar.y
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+int yylex();
+void yyerror(const char *s);
+%}
+
+%token DIGIT ALPHA
+
+%%
+// A variable must start with an ALPHA, followed by any number of ALPHAs or DIGITs
+valid_var: ALPHA var { printf("\nValid Variable!\n"); return 0; }
+         | ALPHA     { printf("\nValid Variable!\n"); return 0; }
+         ;
+
+var: ALPHA
+   | DIGIT
+   | var ALPHA
+   | var DIGIT
+   ;
+%%
+
+int main() 
+{
+    printf("Enter the variable name: ");
+    yyparse();
+    return 0;
+}
+
+void yyerror(const char *s) 
+{
+    printf("\nInvalid Variable!\n");
+    exit(1);
+}
+
+
