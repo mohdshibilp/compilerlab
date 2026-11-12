@@ -1,0 +1,28 @@
+number of lines, words, chars
+%{
+#include <stdio.h>
+int lines = 0, words = 0, chars = 0;
+%}
+
+%%
+\n          { lines++; chars++; }         /* Newline: 1 line, 1 character */
+[ \t]       { chars++; }                  /* Space/Tab: 1 character */
+[^ \t\n]+   { words++; chars += yyleng; } /* Anything else is a word. Add its length to chars */
+%%
+
+int yywrap() 
+{
+    return 1;
+}
+
+int main() 
+{
+    printf("Enter the program (Press Ctrl+D to stop):\n");
+    yylex();
+    
+    printf("\nNo. of lines = %d\n", lines);
+    printf("No. of words = %d\n", words);
+    printf("No. of characters = %d\n", chars);
+    
+    return 0;
+}
