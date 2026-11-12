@@ -1,0 +1,23 @@
+substring conversion
+%{
+#include <stdio.h>
+%}
+
+%%
+"abc"   { printf("ABC"); }        /* Directly match the substring "abc" and replace with "ABC" */
+.       { printf("%s", yytext); } /* Echo any other character exactly as it was typed */
+\n      { printf("\n"); }         /* Preserve newlines to match the output format */
+%%
+
+int yywrap() 
+{
+    return 1;
+}
+
+int main() 
+{
+    // The record doesn't show a prompt message, so we just wait for input
+    yylex();
+    return 0;
+
+}
