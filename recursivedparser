@@ -1,0 +1,93 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define epsilon 238
+
+// Global variables for parsing state
+int flag = 0, len = 0, pt = 0;
+char st[25];
+
+// Function prototypes for non-terminals
+void E();
+void T();
+void F();
+void EPRIME();
+void TPRIME();
+void ADVANCE();
+
+int main() 
+{
+    pt = 0; // Reset pointer
+    printf("\nRecursive Descent Parser\n");
+    printf("Grammar:\n");
+    printf("E  -> TE'\nE' -> +TE' / %c\nT  -> FT'\nT' -> *FT' / %c\nF  -> (E) / a\n", epsilon, epsilon);
+    
+    printf("\nEnter the string: ");
+    scanf("%s", st);
+    len = strlen(st);
+    
+    E(); // Start parsing from the start symbol
+    
+    // If no errors were flagged and the entire string was consumed
+    if((flag == 0) && (len == pt))
+        printf("\n\nString is accepted\n\n");
+    else
+        printf("\n\nString is rejected\n\n");
+        
+    return 0;
+}
+
+// E -> TE'
+void E() { 
+    T(); 
+    EPRIME(); 
+}
+
+// T -> FT'
+void T() { 
+    F(); 
+    TPRIME(); 
+}
+
+// E' -> +TE' | epsilon
+void EPRIME() { 
+    if(st[pt] == '+') { 
+        ADVANCE(); 
+        T(); 
+        EPRIME(); 
+    } 
+}
+
+// T' -> *FT' | epsilon
+void TPRIME() { 
+    if(st[pt] == '*') { 
+        ADVANCE(); 
+        F(); 
+        TPRIME(); 
+    } 
+}
+
+// F -> (E) | a
+void F() {
+    if(st[pt] == '(') {
+        ADVANCE(); 
+        E();
+        if(st[pt] == ')') {
+            ADVANCE();
+        } else {
+            flag = 1; // Error: missing closing parenthesis
+        }
+    } 
+    else if(st[pt] == 'a') {
+        ADVANCE();
+    } 
+    else {
+        flag = 1; // Error: unexpected symbol
+    }
+}
+
+// Move to the next input token
+void ADVANCE() { 
+    pt++; 
+}
